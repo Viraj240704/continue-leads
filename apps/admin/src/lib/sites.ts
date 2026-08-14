@@ -42,6 +42,23 @@ export interface CreateBrandInput {
   };
 }
 
+async function ensureUniqueBrandSlug(c: Client, tenantId: string, requestedSlug: string) {
+  const baseSlug = requestedSlug.trim();
+  if (!baseSlug) throw new Error("Brand slug is required");
+
+  const { rows } = await c.query(
+    `SELECT slug FROM brands WHERE tenant_id = $1 AND (slug = $2 OR slug LIKE $3)`,
+    [tenantId, baseSlug, `${baseSlug}-%`]
+  );
+
+  const existing = new Set(rows.map((row) => String(row.slug)));
+  if (!existing.has(baseSlug)) return baseSlug;
+
+  let suffix = 2;
+  while (existing.has(`${baseSlug}-${suffix}`)) suffix += 1;
+  return `${baseSlug}-${suffix}`;
+}
+
 export async function createBrandWithPlan(
   c: Client,
   tenantId: string,
@@ -72,10 +89,11 @@ export async function createBrandWithPlan(
 
   const urlPattern = input.urlPattern || "/services/{service}/{city}";
   const blogConfig = input.blogConfig ?? { enabled: false };
+  const uniqueSlug = await ensureUniqueBrandSlug(c, tenantId, input.slug);
   const brand = await c.query(
     `INSERT INTO brands (tenant_id, name, slug, vertical_pack_id, template_family, domain, profile, status, brief, domain_status, site_type, url_pattern, blog_config)
      VALUES ($1,$2,$3,$4,$5,$6,$7,'active',$8,$9,$10,$11,$12) RETURNING id`,
-    [tenantId, input.name, input.slug, input.verticalPackId, templateFamily, input.domain, profile,
+    [tenantId, input.name, uniqueSlug, input.verticalPackId, templateFamily, input.domain, profile,
      input.brief ?? "", input.domainStatus ?? "provided", input.siteType ?? "local", urlPattern, JSON.stringify(blogConfig)]
   );
   const brandId = brand.rows[0].id as string;

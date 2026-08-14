@@ -19,11 +19,7 @@ export default async function NewBrandPage() {
 
   return (
     <AppShell user={user}>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">New build</p>
-      <h1 className="mb-0.5 font-display text-xl font-bold text-ink">New brand & site</h1>
-      <p className="mb-4 text-xs text-dim">
-        Configure your brand, services, and target geography. Review the estimate before creating the page plan.
-      </p>
+      <div className="mb-5"><h1 className="font-sans text-l font-bold tracking-tight">New site</h1></div>
       <Wizard packs={packData} />
     </AppShell>
   );

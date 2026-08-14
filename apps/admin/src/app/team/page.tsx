@@ -11,13 +11,7 @@ export default async function TeamPage() {
   const team = await withTenant(user.tenantId, (c) => getTeam(c, user.tenantId));
   return (
     <AppShell user={user}>
-      <div className="mb-6">
-        <p className="eyebrow mb-1">Settings</p>
-        <h1 className="font-sans text-2xl font-bold">Team</h1>
-        <p className="text-sm text-dim">
-          Invite teammates on the <span className="mono">@{team.orgDomain || "your-domain"}</span> domain and assign their role.
-        </p>
-      </div>
+      <div className="mb-5"><h1 className="font-sans text-l font-bold tracking-tight">Team</h1></div>
       <TeamManager team={team} currentUserId={user.userId} />
     </AppShell>
   );
