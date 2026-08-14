@@ -2,6 +2,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateBriefAction, deleteAssetAction, setLogoAction, checkDomainAction, purchaseDomainAction } from "@/app/actions/manage";
+import { CloseIcon } from "@/components/Icons";
 
 interface Asset { id: string; kind: string; filename: string; text_content: string; content_type: string }
 
@@ -11,30 +12,42 @@ export function Manage(props: {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [brief, setBrief] = useState(props.brief);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [briefSaved, setBriefSaved] = useState(Boolean(props.brief.trim()));
+  const [editingBrief, setEditingBrief] = useState(!props.brief.trim());
+  const briefRef = useRef<HTMLTextAreaElement>(null);
   const refresh = () => router.refresh();
+  const editBrief = () => {
+    setEditingBrief(true);
+    requestAnimationFrame(() => {
+      const textarea = briefRef.current;
+      if (textarea) {
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      }
+    });
+  };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      {/* Brief */}
-      <div className="card">
-        <h3 className="mb-1 font-semibold">Content brief</h3>
-        <p className="mb-2 text-xs text-faint">Extra instructions the generator uses (emphasis, differentiators). Applied on next generate.</p>
-        <textarea className="input min-h-[110px]" value={brief} onChange={(e) => setBrief(e.target.value)}
-          placeholder="e.g. Emphasize family-owned since 1998, eco-friendly low-VOC paints, and same-week scheduling." />
-        <button className="btn mt-2" disabled={pending}
-          onClick={() => start(async () => { await updateBriefAction(props.brandId, brief); setMsg("Brief saved"); refresh(); })}>
-          Save brief
-        </button>
-      </div>
-
+    <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(220px,1fr)] md:grid-rows-[auto_auto] lg:grid-cols-[minmax(0,7fr)_minmax(280px,3fr)]">
       {/* Domain */}
       <DomainPanel brandId={props.brandId} domain={props.domain} domainStatus={props.domainStatus} onChange={refresh} />
 
-      {/* Assets */}
-      <AssetsPanel brandId={props.brandId} assets={props.assets} logoAssetId={props.logoAssetId} onChange={refresh} />
+      {/* Brief */}
+      <div className="card flex flex-col">
+        <div className="mb-1 flex items-center justify-between gap-4">
+          <h3 className="font-semibold">Content brief</h3>
+          <button className="btn btn-sm" disabled={pending}
+            onClick={() => briefSaved && !editingBrief ? editBrief() : start(async () => { await updateBriefAction(props.brandId, brief); setBriefSaved(true); setEditingBrief(false); refresh(); })}>
+            {briefSaved && !editingBrief ? "Edit Brief" : "Save Brief"}
+          </button>
+        </div>
+        <p className="mb-2 text-xs text-faint">Extra instructions the generator uses (emphasis, differentiators). Applied on next generate.</p>
+        <textarea ref={briefRef} className="input min-h-[110px] flex-1" value={brief} disabled={briefSaved && !editingBrief} onChange={(e) => setBrief(e.target.value)}
+          placeholder="e.g. Emphasize family-owned since 1998, eco-friendly low-VOC paints, and same-week scheduling." />
+      </div>
 
-      {msg && <p className="text-sm text-accent lg:col-span-3">{msg}</p>}
+      {/* Assets */}
+      <div className="md:col-start-2 md:row-span-2 md:row-start-1"><AssetsPanel brandId={props.brandId} assets={props.assets} logoAssetId={props.logoAssetId} onChange={refresh} /></div>
     </div>
   );
 }
@@ -58,7 +71,7 @@ function DomainPanel({ brandId, domain, domainStatus, onChange }: { brandId: str
           onClick={() => start(async () => { setNote(null); setQuote(await checkDomainAction(q)); })}>Check</button>
       </div>
       {quote && (
-        <div className="mt-3 space-y-1 text-sm">
+        <div className="hidden">
           <div className="flex items-center justify-between">
             <span className="font-mono">{quote.domain}</span>
             {quote.available
@@ -89,10 +102,26 @@ function DomainPanel({ brandId, domain, domainStatus, onChange }: { brandId: str
           )}
         </div>
       )}
+      {quote && <DomainResultModal quote={quote} pending={pending} onClose={() => setQuote(null)} onRegister={(domainToBuy) => start(async () => {
+        const r = await purchaseDomainAction(brandId, domainToBuy);
+        setNote(r.ok ? `Registered ${domainToBuy} (simulated, $${r.priceUsd})` : `Failed: ${r.reason ?? "registration failed"}`);
+        if (r.ok) onChange();
+      })} />}
       {note && <p className="mt-2 text-xs text-accent">{note}</p>}
       <p className="mt-2 text-[11px] text-dim">Registration is simulated — no real purchase occurs.</p>
     </div>
   );
+}
+
+function DomainResultModal({ quote, pending, onClose, onRegister }: { quote: any; pending: boolean; onClose: () => void; onRegister: (domain: string) => void }) {
+  return <div className="fixed inset-0 z-50 grid place-items-center bg-ink/25 p-4" role="presentation" onMouseDown={onClose}>
+    <div className="card w-full max-w-md p-6 shadow-xl" role="dialog" aria-modal="true" aria-labelledby="domain-result-title" onMouseDown={(e) => e.stopPropagation()}>
+      <div className="flex items-start justify-between gap-4"><div><h2 id="domain-result-title" className="font-semibold">Domain check result</h2><p className="mt-1 font-mono text-sm text-dim">{quote.domain}</p></div><button type="button" className="grid h-8 w-8 place-items-center rounded-lg text-faint hover:bg-raised hover:text-ink" onClick={onClose} aria-label="Close"><CloseIcon size={17} /></button></div>
+      <div className="mt-5 flex items-center justify-between"><span className="text-sm font-semibold">Status</span><span className={`pill ${quote.available ? "bg-ok/12 text-ok" : "bg-bad/12 text-bad"}`}>{quote.available ? "Available" : "Taken"}</span></div>
+      {quote.available ? <button className="btn mt-5 w-full" disabled={pending} onClick={() => onRegister(quote.domain)}>Register ${quote.priceUsd}</button> : quote.suggestions?.length > 0 && <div className="mt-5"><p className="mb-2 text-sm font-semibold">Available alternatives</p><div className="space-y-2">{quote.suggestions.filter((s: any) => s.available).slice(0, 3).map((s: any) => <button key={s.domain} type="button" className="flex w-full items-center justify-between rounded-lg border border-line px-3 py-2.5 text-left text-sm transition hover:border-primary hover:bg-primary/5" disabled={pending} onClick={() => onRegister(s.domain)}><span className="font-mono">{s.domain}</span><span className="font-semibold text-accent">Register ${s.priceUsd}</span></button>)}</div></div>}
+      <p className="mt-5 text-[11px] text-dim">Registration is simulated — no real purchase occurs.</p>
+    </div>
+  </div>;
 }
 
 function AssetsPanel({ brandId, assets, logoAssetId, onChange }: { brandId: string; assets: Asset[]; logoAssetId: string | null; onChange: () => void }) {

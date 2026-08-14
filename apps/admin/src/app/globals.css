@@ -68,6 +68,15 @@
   .btn-danger:hover { background: #fee4e2; }
   .btn-sm { @apply px-3 py-1.5 text-xs; }
 
+  /* ---- Generation workflow steps ---- */
+  .pipeline-step {
+    @apply inline-flex items-center justify-center gap-2 rounded-[var(--r)] px-4 py-2 text-sm font-semibold transition;
+    color: var(--dim); border: 1px solid var(--line); background: #fff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+  .pipeline-step:hover:not(:disabled) { background: var(--raised); color: var(--ink); border-color: #d0d5dd; }
+  .pipeline-step:disabled { opacity: 0.5; }
+
   /* ---- Surfaces ---- */
   .card {
     @apply rounded-[var(--r-lg)] p-5;

@@ -22,19 +22,19 @@ export function PipelineBar({ brandId, status }: { brandId: string; status: stri
   return (
     <div className="card">
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <button className="btn" disabled={pending}
+        <button className="pipeline-step" disabled={pending}
           onClick={() => run(() => generateAllAction(brandId), (r) => `Generated ${r.generated} pages · QA ${r.qaPass} pass / ${r.qaWarn} warn / ${r.qaFail} fail · $${r.costUsd}`)}>
           1 · Generate all
         </button>
-        <button className="btn-ghost" disabled={pending}
+        <button className="pipeline-step" disabled={pending}
           onClick={() => run(() => approveAllAction(brandId), (r) => `Approved ${r.approved} eligible pages`)}>
           2 · Approve all eligible
         </button>
-        <button className="btn-ghost" disabled={pending}
+        <button className="pipeline-step" disabled={pending}
           onClick={() => run(() => scheduleAction(brandId), (r) => `Built ${r.length} waves`)}>
           3 · Build schedule
         </button>
-        <button className="btn" disabled={pending}
+        <button className="pipeline-step" disabled={pending}
           onClick={() => run(() => publishTickAction(brandId), (r) => r.blocked ? `Blocked — ${r.blocked}` : `Published ${r.published}, skipped ${r.skipped}${r.manifestVersion ? ` · manifest v${r.manifestVersion}` : ""}`)}>
           4 · Run publisher tick
         </button>

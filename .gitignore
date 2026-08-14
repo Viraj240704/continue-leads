@@ -39,6 +39,9 @@ node_modules/
 **/node_modules/
 .next/
 **/.next/
+# Next.js development output (the admin app uses this separate distDir).
+.next-dev/
+**/.next-dev/
 .turbo/
 **/.turbo/
 .pnpm-store/

@@ -64,7 +64,7 @@ export function BlogPanel({ brandId, domain, config, canWrite }: { brandId: stri
       )}
 
       {canWrite && (
-        <div className="mt-3 flex items-center gap-2 border-t border-line pt-3">
+        <div className="mt-3 flex items-center gap-2 [&>button]:hidden">
           <button className="btn btn-sm" disabled={pending} onClick={save}>{pending ? "Working…" : b.enabled ? "Save & generate" : "Save"}</button>
           {msg && <span className="text-xs text-ok">{msg}</span>}
         </div>
