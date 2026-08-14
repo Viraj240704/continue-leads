@@ -47,12 +47,12 @@ export function Compliance({ brandId, compliance }: Props) {
             <button className="btn-ghost btn-sm" disabled={pending} onClick={() => run(false)}>Revoke sign-off</button>
           </div>
         ) : (
-          <div className="space-y-2">
-            <input className="input text-xs" placeholder="Reviewer notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
-            <div className="flex items-center gap-2">
-              <button className="btn btn-sm" disabled={pending || !compliance.autoOk} onClick={() => run(true)}>Approve for go-live (legal sign-off)</button>
-              {!compliance.autoOk && <span className="text-xs text-warn">Resolve the automated checks above first.</span>}
+          <div>
+            <div className="flex h-9 gap-2">
+              <input className="input h-9 min-w-0 flex-1 py-0 text-xs" placeholder="Reviewer notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
+              <button className="btn btn-sm h-9 shrink-0" disabled={pending || !compliance.autoOk} onClick={() => run(true)}>Approve for go-live (legal sign-off)</button>
             </div>
+            {!compliance.autoOk && <p className="mt-2 text-xs text-warn">Resolve the automated checks above first.</p>}
           </div>
         )}
       </div>

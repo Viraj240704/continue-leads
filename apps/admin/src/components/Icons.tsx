@@ -201,6 +201,13 @@ export const UploadIcon = svg(
   </>,
 );
 
+export const FileTextIcon = svg(<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6M8 13h8M8 17h5" /></>);
+export const SparklesIcon = svg(<><path d="m12 3-1.2 4.2L7 8.5l3.8 1.3L12 14l1.2-4.2L17 8.5l-3.8-1.3Z" /><path d="m19 14-.7 2.3L16 17l2.3.7L19 20l.7-2.3L22 17l-2.3-.7Z" /></>);
+export const CheckCircleIcon = svg(<><circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16 9" /></>);
+export const GlobeIcon = svg(<><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>);
+export const ShieldCheckIcon = svg(<><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6Z" /><path d="m8.5 12 2.2 2.2 4.8-4.8" /></>);
+export const DollarIcon = svg(<><circle cx="12" cy="12" r="9" /><path d="M15 8.5c-.7-.6-1.6-.9-2.7-.9-1.5 0-2.5.7-2.5 1.7 0 2.7 5.4 1.1 5.4 4 0 1.1-1 1.9-2.7 1.9-1.1 0-2.1-.3-2.9-1" /><path d="M12 6v12" /></>);
+
 type IconComponent = (props: IconProps) => React.JSX.Element;
 
 // Maps a nav href to its icon. Falls back to the Sites grid icon.
