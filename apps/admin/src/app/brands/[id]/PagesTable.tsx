@@ -127,13 +127,21 @@ export function PagesTable({ brandId, brandSlug, pages }: { brandId: string; bra
 function PageBrief({ brandId, pageId, initial, onSaved }: { brandId: string; pageId: string; initial: string; onSaved: () => void }) {
   const [val, setVal] = useState(initial);
   const [pending, start] = useTransition();
+  const [editing, setEditing] = useState(!initial.trim());
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-2 py-1 [&>p:first-child]:hidden">
       <p className="text-xs text-dim">Per-page brief — emphasis just for this page (added on next generate/regenerate).</p>
-      <textarea className="input min-h-[64px]" value={val} onChange={(e) => setVal(e.target.value)}
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-xs text-dim">Per-page brief — emphasis just for this page (added on next generate/regenerate).</p>
+        <button className="btn btn-sm shrink-0" disabled={pending}
+          onClick={() => editing
+            ? start(async () => { await updatePageBriefAction(brandId, pageId, val); onSaved(); })
+            : setEditing(true)}>
+          {editing ? "Save Brief" : "Edit Brief"}
+        </button>
+      </div>
+      <textarea className="input min-h-[64px] w-full" value={val} disabled={!editing} onChange={(e) => setVal(e.target.value)}
         placeholder="e.g. Highlight our 10-year warranty and same-week booking for this service." />
-      <button className="btn btn-sm" disabled={pending}
-        onClick={() => start(async () => { await updatePageBriefAction(brandId, pageId, val); onSaved(); })}>Save brief</button>
     </div>
   );
 }

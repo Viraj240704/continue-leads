@@ -15,9 +15,7 @@ export default async function Dashboard() {
     <AppShell user={user}>
       <div className="mb-6 flex items-end justify-between">
         <div>
-          <p className="eyebrow mb-1">Factory floor</p>
-          <h1 className="font-display text-2xl font-bold">Brands</h1>
-          <p className="mt-1 text-sm text-dim">Configure a brand, generate its site, review QA, approve, and progressively publish.</p>
+          <h1 className="font-sans text-xl font-bold tracking-tight">Brands</h1>
         </div>
         <Link href="/brands/new" className="btn">+ New brand</Link>
       </div>

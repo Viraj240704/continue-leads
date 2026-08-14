@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { FileTextIcon, GlobeIcon, SparklesIcon, TemplatesIcon } from "@/components/Icons";
+import { FileTextIcon, SparklesIcon, TemplatesIcon } from "@/components/Icons";
 
 const tabs = [
   { label: "Overview", icon: TemplatesIcon },
   { label: "Content Setup", icon: FileTextIcon },
   { label: "Generation", icon: SparklesIcon },
   { label: "Pages", icon: FileTextIcon },
-  { label: "Publishing", icon: GlobeIcon },
 ] as const;
 type Tab = (typeof tabs)[number];
 
@@ -18,7 +17,7 @@ export function SiteConsoleTabs({ children }: { children: ReactNode[] }) {
   return (
     <div>
       <div className="sticky top-16 z-20 -mx-4 mb-5 bg-[#F8FAFC]/95 px-4 py-1 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-        <div className="grid grid-cols-5 gap-2" role="tablist" aria-label="Site console sections">
+        <div className="grid w-full grid-cols-4 gap-2" role="tablist" aria-label="Site console sections">
           {tabs.map((tab) => {
             const selected = activeTab.label === tab.label;
             const Icon = tab.icon;
@@ -30,7 +29,7 @@ export function SiteConsoleTabs({ children }: { children: ReactNode[] }) {
                 aria-selected={selected}
                 aria-controls={`site-console-panel-${tab.label.toLowerCase().replaceAll(" ", "-")}`}
                 onClick={() => setActiveTab(tab)}
-                className={`flex h-10 min-w-0 items-center justify-center gap-2 rounded-[var(--r)] px-2 text-xs font-semibold transition-all duration-200 ${selected ? "bg-primary text-white shadow-sm" : "border border-line bg-white text-dim shadow-sm hover:border-primary/30 hover:bg-primary/10 hover:text-primary"}`}
+                className={`flex h-12 min-w-0 items-center justify-center gap-3 rounded-xl border px-4 text-sm font-medium transition-all duration-200 sm:px-5 ${selected ? "border-primary/30 bg-[#EEF2FF] text-primary shadow-[0_2px_5px_rgba(79,70,229,0.12)]" : "border-[#E5E7EB] bg-white text-dim shadow-[0_1px_3px_rgba(16,24,40,0.06)] hover:border-primary/30 hover:bg-primary/5 hover:text-primary"}`}
               >
                 <Icon size={15} />
                 <span className="truncate">{tab.label}</span>
