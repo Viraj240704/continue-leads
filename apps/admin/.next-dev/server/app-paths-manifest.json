@@ -1,16 +1,11 @@
 {
-<<<<<<< HEAD
-  "/page": "app/page.js",
-  "/home/page": "app/home/page.js",
-  "/login/page": "app/login/page.js",
-  "/freshness/page": "app/freshness/page.js"
-=======
   "/team/page": "app/team/page.js",
   "/brands/[id]/page": "app/brands/[id]/page.js",
-  "/freshness/page": "app/freshness/page.js",
-  "/analytics/page": "app/analytics/page.js",
   "/buyers/page": "app/buyers/page.js",
+  "/freshness/page": "app/freshness/page.js",
+  "/leads/page": "app/leads/page.js",
   "/brands/new/page": "app/brands/new/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
->>>>>>> fd964f2 (new site)
+  "/analytics/page": "app/analytics/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/home/page": "app/home/page.js"
 }
