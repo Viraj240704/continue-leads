@@ -13,9 +13,9 @@ export async function AppShell({ user, children }: { user: SessionUser; children
   const role = isRole(user.role) ? user.role : "dev";
   const notifs = await withTenant(user.tenantId, (c) => getNotifications(c, role)).catch(() => []);
 
-  // Flat nav list with Home first, then every permitted app section.
+  // Flat nav list with Homepage first, then every permitted app section.
   const navItems: NavLink[] = [
-    { href: "/home", label: "Home" },
+    { href: "/home", label: "Homepage" },
     ...navFor(role).flatMap((g) => g.items.map((i) => ({ href: i.href, label: i.label }))),
   ];
 
@@ -23,7 +23,7 @@ export async function AppShell({ user, children }: { user: SessionUser; children
     <DashboardShell
       navItems={navItems}
       notifs={notifs}
-      user={{ name: user.name, roleLabel: ROLE_LABELS[role], initials: initials(user.name) }}
+      user={{ name: user.name, email: user.email, department: ROLE_LABELS[role], roleLabel: ROLE_LABELS[role], initials: initials(user.name) }}
     >
       {children}
     </DashboardShell>
