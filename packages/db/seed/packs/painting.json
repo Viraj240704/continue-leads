@@ -1,0 +1,53 @@
+{
+  "key": "painting",
+  "version": 1,
+  "name": "Residential & Commercial Painting",
+  "vocabulary": {
+    "actor": "painters",
+    "craft": "painting",
+    "unit": "project",
+    "verbs": ["prep", "prime", "coat", "seal", "finish"],
+    "materials": ["low-VOC paint", "primer", "caulk", "trim enamel"],
+    "adjectives": ["clean-line", "durable", "true-color", "meticulous"]
+  },
+  "services": [
+    { "slug": "interior-painting", "name": "Interior Painting", "hint": "walls, ceilings, trim, cabinets inside the home" },
+    { "slug": "exterior-painting", "name": "Exterior Painting", "hint": "siding, stucco, trim, weatherproofing" },
+    { "slug": "cabinet-refinishing", "name": "Cabinet Refinishing", "hint": "kitchen and bath cabinet spray finishing" },
+    { "slug": "commercial-painting", "name": "Commercial Painting", "hint": "offices, retail, multi-unit, low-disruption scheduling" }
+  ],
+  "pageBlueprints": [
+    { "type": "HOME",    "pathTemplate": "/",                              "priority": 10, "scope": "single",      "dependsOn": [] },
+    { "type": "CONTACT", "pathTemplate": "/contact",                       "priority": 20, "scope": "single",      "dependsOn": ["HOME"] },
+    { "type": "SERVICE", "pathTemplate": "/services/{service}",            "priority": 30, "scope": "perService",  "dependsOn": ["HOME"] },
+    { "type": "CITY",    "pathTemplate": "/areas/{city}",                  "priority": 40, "scope": "perCity",     "dependsOn": ["HOME"] },
+    { "type": "MONEY",   "pathTemplate": "/services/{service}/{city}",     "priority": 50, "scope": "perServiceCity", "dependsOn": ["SERVICE", "CITY"] },
+    { "type": "FAQ",     "pathTemplate": "/faq",                           "priority": 60, "scope": "single",      "dependsOn": ["HOME"] },
+    { "type": "ABOUT",   "pathTemplate": "/about",                         "priority": 70, "scope": "single",      "dependsOn": ["HOME"] },
+    { "type": "PRIVACY", "pathTemplate": "/privacy",                       "priority": 80, "scope": "single", "legal": true, "dependsOn": [] },
+    { "type": "TERMS",   "pathTemplate": "/terms",                         "priority": 81, "scope": "single", "legal": true, "dependsOn": [] },
+    { "type": "TCPA",    "pathTemplate": "/tcpa-disclosure",               "priority": 82, "scope": "single", "legal": true, "dependsOn": [] }
+  ],
+  "allowedClaims": [
+    "Licensed and insured painting contractor",
+    "Free written estimates",
+    "Workmanship warranty on labor",
+    "Low-VOC and eco-friendly paint options available"
+  ],
+  "prohibitedClaims": [
+    "cheapest in {city}",
+    "guaranteed #1 on Google",
+    "lifetime free repainting",
+    "government approved"
+  ],
+  "requiredLocalFacts": ["service_area_cities", "years_in_business", "license_reference"],
+  "faq": [
+    { "q": "How long does a typical {service} project take?", "a": "Most residential {service} projects are completed in 2 to 5 working days depending on prep, square footage and dry times." },
+    { "q": "Do you offer free estimates?", "a": "Yes. We provide a free written estimate after an on-site walkthrough so the scope and price are clear before any work begins." },
+    { "q": "What paint brands do you use?", "a": "We use professional-grade, low-VOC coatings selected for durability in the {city} climate and matched to each surface." }
+  ],
+  "imagery": {
+    "heroThemes": ["freshly painted interior", "crew on exterior scaffolding", "color consultation", "cabinet spray booth"],
+    "categories": ["before-after", "detail-work", "crew", "color-swatch"]
+  }
+}

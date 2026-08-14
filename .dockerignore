@@ -1,0 +1,36 @@
+# Monorepo build context = repo root. The app image only needs apps/ + packages/ +
+# workspace manifests. Everything below is excluded so the Dockerfile's `COPY . .` never
+# bakes infra, Terraform state, or secrets into the image.
+
+# ---- Infra (never belongs in the app image) ----
+terraform/
+docker/
+scripts/
+docs/
+*.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# ---- Secrets / env ----
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+
+# ---- Node / Next / build artifacts ----
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+**/.data
+**/preview-store
+**/live-store
+
+# ---- VCS / tooling / misc ----
+.git
+.github
+.claude/
+CLAUDE.md
+*.log
+**/.DS_Store

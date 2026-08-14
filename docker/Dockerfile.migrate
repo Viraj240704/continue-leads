@@ -1,0 +1,17 @@
+# Standalone image for running DB migrations/seed as a one-off ECS task.
+# Kept separate from the app image because the Next.js standalone bundle only traces
+# what the app imports (packages/db + dotenv are not included). Build context = monorepo root.
+#   docker build -f docker/Dockerfile.migrate -t <ecr>:migrate .
+# syntax=docker/dockerfile:1
+FROM node:20-alpine
+WORKDIR /db
+
+# Install only packages/db's runtime deps (pg, dotenv, bcryptjs) — no pnpm symlink juggling.
+COPY packages/db/package.json ./
+RUN npm install --omit=dev --no-package-lock
+
+# Migration runner + SQL files + seed.
+COPY packages/db/ ./
+
+# DATABASE_URL is injected from Secrets Manager at runtime by the ECS task.
+CMD ["node", "migrate.mjs"]

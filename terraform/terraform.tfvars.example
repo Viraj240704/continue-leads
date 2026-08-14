@@ -1,0 +1,30 @@
+# Copy to terraform.tfvars (gitignored) and fill in. Secrets can also be passed via
+# TF_VAR_* env vars in CI instead of committing them here.
+
+# Core
+aws_region  = "us-east-1"
+environment = "staging"
+name_prefix = "cl"
+
+# DNS / Cloudflare
+root_domain          = "continueleads.com"
+admin_subdomain      = "admin"
+cloudflare_zone_id   = "your_cloudflare_zone_id"
+cloudflare_api_token = "your_cloudflare_api_token" # scope: Zone.DNS edit
+
+# App secrets (better: set as TF_VAR_session_secret etc. in CI)
+session_secret    = "generate-a-long-random-string"
+anthropic_api_key = "sk-ant-..."
+voyage_api_key    = "pa-..."
+sentry_dsn        = ""
+
+# Sizing (staging defaults; bump for prod)
+db_instance_class = "db.t4g.medium"
+db_multi_az       = true
+app_desired_count = 2
+
+# --- Cost guardrails & developer role ---
+alert_email        = "you@example.com"   # budget + billing alarm notifications (confirm the SNS email!)
+monthly_budget_usd = 35                  # hard-cap threshold
+budget_enforce     = true                # at 100% attach deny policy to developer role
+# developer_trust_arns = ["arn:aws:iam::<acct>:user/<you>"]  # default: account root (MFA required)

@@ -1,0 +1,53 @@
+{
+  "key": "roofing",
+  "version": 1,
+  "name": "Residential Roofing & Repair",
+  "vocabulary": {
+    "actor": "roofers",
+    "craft": "roofing",
+    "unit": "roof",
+    "verbs": ["inspect", "tear-off", "underlay", "flash", "install"],
+    "materials": ["architectural shingles", "underlayment", "drip edge", "ridge vent"],
+    "adjectives": ["storm-ready", "watertight", "code-compliant", "long-warranty"]
+  },
+  "services": [
+    { "slug": "roof-replacement", "name": "Roof Replacement", "hint": "full tear-off and re-roof with new underlayment and shingles" },
+    { "slug": "roof-repair", "name": "Roof Repair", "hint": "leak tracing, flashing, shingle and vent repair" },
+    { "slug": "storm-damage", "name": "Storm Damage Restoration", "hint": "hail and wind damage, insurance documentation support" },
+    { "slug": "gutter-installation", "name": "Gutter Installation", "hint": "seamless gutters, guards and downspouts" }
+  ],
+  "pageBlueprints": [
+    { "type": "HOME",    "pathTemplate": "/",                              "priority": 10, "scope": "single",      "dependsOn": [] },
+    { "type": "CONTACT", "pathTemplate": "/contact",                       "priority": 20, "scope": "single",      "dependsOn": ["HOME"] },
+    { "type": "SERVICE", "pathTemplate": "/services/{service}",            "priority": 30, "scope": "perService",  "dependsOn": ["HOME"] },
+    { "type": "CITY",    "pathTemplate": "/areas/{city}",                  "priority": 40, "scope": "perCity",     "dependsOn": ["HOME"] },
+    { "type": "MONEY",   "pathTemplate": "/services/{service}/{city}",     "priority": 50, "scope": "perServiceCity", "dependsOn": ["SERVICE", "CITY"] },
+    { "type": "FAQ",     "pathTemplate": "/faq",                           "priority": 60, "scope": "single",      "dependsOn": ["HOME"] },
+    { "type": "ABOUT",   "pathTemplate": "/about",                         "priority": 70, "scope": "single",      "dependsOn": ["HOME"] },
+    { "type": "PRIVACY", "pathTemplate": "/privacy",                       "priority": 80, "scope": "single", "legal": true, "dependsOn": [] },
+    { "type": "TERMS",   "pathTemplate": "/terms",                         "priority": 81, "scope": "single", "legal": true, "dependsOn": [] },
+    { "type": "TCPA",    "pathTemplate": "/tcpa-disclosure",               "priority": 82, "scope": "single", "legal": true, "dependsOn": [] }
+  ],
+  "allowedClaims": [
+    "Licensed and insured roofing contractor",
+    "Free roof inspection and written estimate",
+    "Manufacturer-backed shingle warranty options",
+    "Insurance claim documentation assistance"
+  ],
+  "prohibitedClaims": [
+    "we always beat any insurance deductible",
+    "guaranteed approval of your claim",
+    "cheapest roof in {city}",
+    "lifetime free roof"
+  ],
+  "requiredLocalFacts": ["service_area_cities", "years_in_business", "license_reference"],
+  "faq": [
+    { "q": "How do I know if I need a {service}?", "a": "Common signs include active leaks, missing or curling shingles, granules in the gutters and daylight in the attic. We confirm with a free on-roof inspection." },
+    { "q": "Do you help with storm and insurance claims?", "a": "Yes. We document damage with photos and measurements and coordinate with your adjuster so your {city} claim is supported by evidence." },
+    { "q": "How long does a roof replacement take?", "a": "Most single-family {city} roof replacements are completed in 1 to 3 days, weather permitting." }
+  ],
+  "imagery": {
+    "heroThemes": ["new architectural shingle roof", "crew installing underlayment", "aerial roof inspection", "seamless gutter run"],
+    "categories": ["completed-roof", "crew-safety", "storm-damage", "material-detail"]
+  }
+}

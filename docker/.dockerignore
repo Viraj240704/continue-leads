@@ -1,0 +1,13 @@
+# Use from the APP repo root as build context.
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+**/.data
+**/preview-store
+**/live-store
+.git
+**/.env
+**/.env.local
+*.log
+**/.DS_Store

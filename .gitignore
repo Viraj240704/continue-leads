@@ -1,0 +1,80 @@
+# dbt
+target/
+dbt_packages/
+logs/
+.dbt/
+
+# Prefect
+.prefect/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Credentials — NEVER COMMIT THESE
+profiles.yml
+.env
+*.env
+.env.*
+!.env.example
+secrets/
+credentials/
+
+# Local data artifacts
+data/**
+!data/
+!data/**/
+!data/**/.gitkeep
+!data/README.md
+!data/**/README.md
+
+# Node / JS monorepo (app)
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+.turbo/
+**/.turbo/
+.pnpm-store/
+*.tsbuildinfo
+# Local app runtime artifacts
+**/.data/
+**/preview-store/
+**/live-store/
+# Next.js standalone build output (stray nested copy)
+apps/admin/continue-leads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# AWS
+.aws/
+
+#Claud
+CLAUDE.md
+.claude/
+
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+*.log
+*.tfvars
+!*.tfvars.example
+.env
+*.pem
+override.tf
+override.tf.json

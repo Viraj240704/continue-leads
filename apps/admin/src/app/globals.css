@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   Continue Leads — light enterprise design system
+   Clean white surfaces, soft elevation, indigo primary action, amber brand accent.
+   ============================================================================ */
+
+:root {
+  color-scheme: light;
+  --canvas: #f5f6f8;
+  --surface: #ffffff;
+  --raised: #f1f3f6;
+  --line: #e4e7ec;
+  --line-soft: #eff1f4;
+  --ink: #101828;
+  --dim: #475467;
+  --faint: #8a94a6;
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --amber: #d97706;
+  --data: #175cd3;
+  --ok: #12b76a;
+  --warn: #f79009;
+  --bad: #f04438;
+  --info: #2e90fa;
+  --violet: #7a5af8;
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 12px;
+  --ring: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+@layer base {
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans), Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-sans), Inter, system-ui, sans-serif; letter-spacing: -0.012em; color: var(--ink); }
+  ::selection { background: rgba(79, 70, 229, 0.14); }
+  * { border-color: var(--line); }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: none; box-shadow: var(--ring); border-radius: 6px;
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+}
+
+@layer components {
+  /* ---- Buttons ---- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[var(--r)] px-4 py-2 text-sm font-semibold transition;
+    background: var(--primary); color: #fff; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+  }
+  .btn:hover { background: var(--primary-dark); }
+  .btn:disabled { opacity: 0.5; }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-[var(--r)] px-4 py-2 text-sm font-medium transition;
+    color: var(--dim); border: 1px solid var(--line); background: #fff; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+  .btn-ghost:hover { background: var(--raised); color: var(--ink); border-color: #d0d5dd; }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-[var(--r)] px-4 py-2 text-sm font-medium transition;
+    color: var(--bad); border: 1px solid #fda29b; background: #fff5f4;
+  }
+  .btn-danger:hover { background: #fee4e2; }
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+
+  /* ---- Surfaces ---- */
+  .card {
+    @apply rounded-[var(--r-lg)] p-5;
+    background: var(--surface); border: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  }
+  .panel { @apply rounded-[var(--r-lg)]; background: var(--surface); border: 1px solid var(--line); }
+
+  /* ---- Forms ---- */
+  .input {
+    @apply w-full rounded-[var(--r)] px-3 py-2 text-sm transition;
+    background: #fff; color: var(--ink); border: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+  }
+  .input::placeholder { color: var(--faint); }
+  .input:focus { border-color: var(--primary); box-shadow: var(--ring); outline: none; }
+  .label { @apply mb-1.5 block text-xs font-semibold; color: var(--dim); }
+
+  /* ---- Eyebrow / section header ---- */
+  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[0.09em]; color: var(--primary); }
+  .section-title { @apply flex items-center gap-2 text-sm font-semibold; color: var(--ink); }
+  .section-title::before { content: ""; width: 4px; height: 16px; border-radius: 2px; background: var(--primary); }
+
+  /* ---- Pills / chips ---- */
+  .pill { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold; }
+  .chip { @apply inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs; border-color: var(--line); color: var(--dim); background: #fff; }
+
+  /* ---- Tables ---- */
+  .th { @apply px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.04em]; color: var(--faint); }
+  .td { @apply px-3 py-2.5 text-sm; color: var(--ink); }
+  .data-table thead { background: var(--raised); }
+  .data-table tbody tr { transition: background 0.12s; }
+  .data-table tbody tr:hover { background: #fafbfc; }
+  .mono { font-family: var(--font-mono); }
+
+  /* ---- Metric / stat tile ---- */
+  .stat-num { @apply text-2xl font-bold; letter-spacing: -0.02em; color: var(--ink); }
+  .stat-label { @apply text-[11px] font-semibold uppercase tracking-[0.05em]; color: var(--faint); }
+
+  /* ---- Quality meter ---- */
+  .meter { @apply h-2 w-full overflow-hidden rounded-full; background: var(--line-soft); }
+  .meter > span { @apply block h-full rounded-full; }
+
+  .divider { height: 1px; background: var(--line); }
+}
+
+/* ---- Wave rail (publishing cadence motif) ---- */
+.wave-rail { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+.wave-rail .seg { width: 6px; border-radius: 2px; background: var(--line); }
+.wave-rail .seg.live { background: var(--primary); }
+.wave-rail .seg.sched { background: rgba(79, 70, 229, 0.28); }

@@ -1,0 +1,161 @@
+name: Staging Deploy
+
+# CI + CD for the staging environment. On every push to `staging` we lint & build,
+# then build/push the app + migration images to ECR, run DB migrations as a one-off
+# Fargate task, roll the ECS service to the new image, and smoke-test /login.
+#
+# Auth is via GitHub OIDC — the AWS_DEPLOY_ROLE_ARN secret holds the ARN of the
+# `cl-staging-github-ci` role (see terraform/github-oidc.tf). No static AWS keys.
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: "519725697847"
+  ECR_REPO: cl-staging-admin
+  ECS_CLUSTER: cl-staging-cluster
+  ECS_SERVICE: cl-staging-admin
+  TASK_FAMILY: cl-staging-admin
+  CONTAINER_NAME: admin
+  # Public HTTPS hostname (Cloudflare DNS-only record -> ALB, ACM cert). Used by the smoke test.
+  APP_FQDN: admin-staging.continueleads.com
+  APP_SECRET_ID: cl-staging/app
+  MIGRATE_LOG_GROUP: /ecs/cl-migrate
+
+jobs:
+  ci:
+    name: Lint & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run build
+
+  deploy:
+    name: Build, migrate & deploy
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required to request the OIDC token
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push images
+        env:
+          ECR: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          # Fargate needs a single-arch linux/amd64 image with no attestation manifest.
+          docker buildx build --provenance=false --platform linux/amd64 \
+            -f docker/Dockerfile -t "$ECR:app-$SHA" -t "$ECR:app" --push .
+          # Migration image is separate — the Next standalone bundle omits packages/db.
+          docker buildx build --provenance=false --platform linux/amd64 \
+            -f docker/Dockerfile.migrate -t "$ECR:migrate-$SHA" -t "$ECR:migrate" --push .
+          echo "APP_IMAGE=$ECR:app-$SHA"     >> "$GITHUB_ENV"
+          echo "MIGRATE_IMAGE=$ECR:migrate-$SHA" >> "$GITHUB_ENV"
+
+      - name: Run database migrations (one-off Fargate task)
+        run: |
+          set -euo pipefail
+          # Ensure the migration log group exists (the exec role lacks CreateLogGroup).
+          aws logs create-log-group --log-group-name "$MIGRATE_LOG_GROUP" 2>/dev/null || true
+
+          # Discover networking + secret from tagged resources (Terraform state is local).
+          SUBNETS=$(aws ec2 describe-subnets \
+            --filters "Name=tag:Name,Values=cl-staging-private-*" \
+            --query 'Subnets[].SubnetId' --output text | tr '\t' ',')
+          SG=$(aws ec2 describe-security-groups \
+            --filters "Name=tag:Name,Values=cl-staging-app-sg" \
+            --query 'SecurityGroups[0].GroupId' --output text)
+          SECRET_ARN=$(aws secretsmanager describe-secret \
+            --secret-id "$APP_SECRET_ID" --query 'ARN' --output text)
+          EXEC_ROLE=$(aws iam list-roles \
+            --query "Roles[?contains(RoleName,'cl-staging-ecs-exec')].Arn | [0]" --output text)
+
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --family cl-migrate \
+            --requires-compatibilities FARGATE --network-mode awsvpc \
+            --cpu 256 --memory 512 \
+            --execution-role-arn "$EXEC_ROLE" \
+            --container-definitions "[{
+              \"name\":\"migrate\",\"image\":\"${MIGRATE_IMAGE}\",\"essential\":true,
+              \"command\":[\"node\",\"migrate.mjs\"],
+              \"secrets\":[{\"name\":\"DATABASE_URL\",\"valueFrom\":\"${SECRET_ARN}:DATABASE_URL::\"}],
+              \"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{
+                \"awslogs-group\":\"${MIGRATE_LOG_GROUP}\",\"awslogs-region\":\"${AWS_REGION}\",\"awslogs-stream-prefix\":\"migrate\"}}
+            }]" \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+
+          TASK_ARN=$(aws ecs run-task --cluster "$ECS_CLUSTER" --launch-type FARGATE \
+            --task-definition "$TASK_DEF_ARN" \
+            --network-configuration "awsvpcConfiguration={subnets=[${SUBNETS}],securityGroups=[${SG}],assignPublicIp=DISABLED}" \
+            --query 'tasks[0].taskArn' --output text)
+
+          echo "Waiting for migration task to finish ($TASK_ARN)…"
+          aws ecs wait tasks-stopped --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN"
+          CODE=$(aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          echo "Migration exit code: $CODE"
+          [ "$CODE" = "0" ] || { echo "::error::Migration FAILED"; exit 1; }
+
+      - name: Deploy new image to ECS service
+        run: |
+          set -euo pipefail
+          # Take the current active task def, swap in the new image, register a new revision.
+          aws ecs describe-task-definition --task-definition "$TASK_FAMILY" \
+            --query 'taskDefinition' --output json > taskdef.json
+
+          jq --arg IMG "$APP_IMAGE" --arg CN "$CONTAINER_NAME" '
+            .containerDefinitions |= map(if .name == $CN then .image = $IMG else . end)
+            | del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
+                  .compatibilities, .registeredAt, .registeredBy)
+          ' taskdef.json > taskdef-new.json
+
+          NEW_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://taskdef-new.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "Registered $NEW_ARN"
+
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" \
+            --task-definition "$NEW_ARN" --force-new-deployment >/dev/null
+
+          echo "Waiting for the service to stabilize…"
+          aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE"
+
+      - name: Smoke test /login
+        run: |
+          set -euo pipefail
+          # TLS mode: port 80 on the ALB 301-redirects to HTTPS, so hit the public FQDN
+          # directly (its ACM cert only matches this hostname, not the raw ALB DNS name).
+          URL="https://${APP_FQDN}/login"
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          echo "GET $URL -> $CODE"
+          [ "$CODE" = "200" ] || { echo "::error::Smoke test failed (expected 200)"; exit 1; }

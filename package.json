@@ -1,0 +1,25 @@
+{
+  "name": "continue-leads",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Continue Leads — Phase 1 Website Factory + Progressive Publishing (local vertical slice)",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @cl/admin dev",
+    "build": "turbo run build",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "node packages/db/migrate.mjs",
+    "db:seed": "node packages/db/seed.mjs",
+    "db:reset": "node packages/db/migrate.mjs --reset && node packages/db/seed.mjs",
+    "setup": "pnpm db:up && node packages/db/wait-for-db.mjs && pnpm db:migrate && pnpm db:seed",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}
