@@ -69,7 +69,6 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "Sites", resource: "sites" },
       { href: "/brands/new", label: "New site", resource: "sites", action: "write" },
-      { href: "/templates", label: "Templates", resource: "sites" },
       { href: "/freshness", label: "Freshness", resource: "pages" },
       { href: "/analytics", label: "Analytics", resource: "sites" },
     ],

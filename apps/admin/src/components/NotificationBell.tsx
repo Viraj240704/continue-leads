@@ -21,7 +21,7 @@ export function NotificationBell({ items }: { items: Notif[] }) {
       <button
         onClick={() => setOpen((o) => !o)}
         title="Notifications"
-        className="relative grid h-9 w-9 place-items-center rounded-md border border-line bg-white text-dim shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition hover:border-[#d0d5dd] hover:bg-raised hover:text-ink"
+        className="relative grid h-9 w-9 place-items-center rounded-full border border-line bg-white text-dim shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition hover:border-[#d0d5dd] hover:bg-raised hover:text-ink"
         aria-label="Notifications"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

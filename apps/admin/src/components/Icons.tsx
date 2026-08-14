@@ -131,6 +131,76 @@ export const LogOutIcon = svg(
   </>,
 );
 
+export const EditIcon = svg(
+  <>
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+  </>,
+);
+
+export const UserIcon = svg(
+  <>
+    <path d="M20 21a8 8 0 0 0-16 0" />
+    <circle cx="12" cy="7" r="4" />
+  </>,
+);
+
+export const MailIcon = svg(
+  <>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m3 7 9 6 9-6" />
+  </>,
+);
+
+export const LockIcon = svg(
+  <>
+    <rect x="5" y="10" width="14" height="11" rx="2" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+  </>,
+);
+
+export const ChevronRightIcon = svg(<path d="m9 18 6-6-6-6" />);
+
+export const BuildingIcon = svg(
+  <>
+    <path d="M3 21h18" />
+    <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16" />
+    <path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2" />
+  </>,
+);
+
+export const MapPinIcon = svg(
+  <>
+    <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+    <circle cx="12" cy="10" r="2.5" />
+  </>,
+);
+
+export const EyeIcon = svg(
+  <>
+    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+    <circle cx="12" cy="12" r="2.5" />
+  </>,
+);
+
+export const TagIcon = svg(
+  <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3.4 13.4a2 2 0 0 1 0-2.8V4h6.6a2 2 0 0 1 1.4.6l9.2 9.2a2 2 0 0 1 0 2.8Z" />,
+);
+
+export const ActivityIcon = svg(
+  <>
+    <path d="M3 12h4l2-7 4 14 2-7h6" />
+  </>,
+);
+
+export const UploadIcon = svg(
+  <>
+    <path d="M12 16V4" />
+    <path d="m7 9 5-5 5 5" />
+    <path d="M5 20h14" />
+  </>,
+);
+
 type IconComponent = (props: IconProps) => React.JSX.Element;
 
 // Maps a nav href to its icon. Falls back to the Sites grid icon.
@@ -138,7 +208,6 @@ export const NAV_ICONS: Record<string, IconComponent> = {
   "/home": HomeIcon,
   "/dashboard": SitesIcon,
   "/brands/new": NewSiteIcon,
-  "/templates": TemplatesIcon,
   "/freshness": FreshnessIcon,
   "/analytics": AnalyticsIcon,
   "/leads": LeadsIcon,
