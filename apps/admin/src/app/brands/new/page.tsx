@@ -19,10 +19,10 @@ export default async function NewBrandPage() {
 
   return (
     <AppShell user={user}>
-      <p className="eyebrow mb-1">New build</p>
-      <h1 className="mb-1 font-display text-2xl font-bold">New brand & site</h1>
-      <p className="mb-6 text-sm text-dim">
-        Configure the brand, pick a product, services and geography, and review the generation-cost estimate before creating the page plan. The design is assigned automatically.
+      <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">New build</p>
+      <h1 className="mb-0.5 font-display text-xl font-bold text-ink">New brand & site</h1>
+      <p className="mb-4 text-xs text-dim">
+        Configure your brand, services, and target geography. Review the estimate before creating the page plan.
       </p>
       <Wizard packs={packData} />
     </AppShell>
