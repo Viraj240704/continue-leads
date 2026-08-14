@@ -3,14 +3,15 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { recordSampleReviewAction } from "@/app/actions/golive";
 import type { GoLiveStatus } from "@/lib/golive";
+import { CheckCircleIcon } from "@/components/Icons";
 
 function GateRow({ ok, label, detail }: { ok: boolean; label: string; detail: string }) {
   return (
-    <div className="flex gap-2">
-      <span className={`mt-0.5 ${ok ? "text-ok" : "text-faint"}`}>{ok ? "✓" : "○"}</span>
-      <div>
-        <div className="text-sm font-medium">{label}</div>
-        <div className="text-xs text-dim">{detail}</div>
+    <div className="flex gap-3 rounded-[var(--r)] bg-canvas/60 p-3">
+      <span className={`mt-0.5 shrink-0 ${ok ? "text-ok" : "text-faint"}`}><CheckCircleIcon size={18} /></span>
+      <div className="min-w-0">
+        <div className="text-sm font-semibold">{label}</div>
+        <div className="mt-1 text-xs leading-5 text-dim">{detail}</div>
       </div>
     </div>
   );
@@ -32,11 +33,11 @@ export function GoLiveChecklist({ brandId, status, canWrite }: { brandId: string
       </div>
       <p className="mb-3 text-xs text-dim">A site cannot flip from <span className="mono">noindex</span> to indexable until every gate passes. Legal & compliance boundary — no override.</p>
 
-      <div className="space-y-2.5">
-        <GateRow ok={status.automatedQa.ok} label="1 · Automated QA" detail={status.automatedQa.detail} />
-        <GateRow ok={status.noindexRemoved.ok} label="2 · Noindex removed" detail={status.noindexRemoved.detail} />
-        <GateRow ok={status.sampleReview.ok} label={`3 · Manual ${status.sampleSize}-page review`} detail={status.sampleReview.detail} />
-        <GateRow ok={status.legalApproved.ok} label="4 · Legal sign-off" detail={status.legalApproved.detail} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <GateRow ok={status.automatedQa.ok} label="Automated QA" detail={status.automatedQa.detail} />
+        <GateRow ok={status.noindexRemoved.ok} label="Noindex removed" detail={status.noindexRemoved.detail} />
+        <GateRow ok={status.sampleReview.ok} label={`Manual ${status.sampleSize}-page review`} detail={status.sampleReview.detail} />
+        <GateRow ok={status.legalApproved.ok} label="Legal sign-off" detail={status.legalApproved.detail} />
       </div>
 
       {status.sampleReview.reviewedAt && (
@@ -51,12 +52,13 @@ export function GoLiveChecklist({ brandId, status, canWrite }: { brandId: string
           {open ? (
             <div className="space-y-2">
               <p className="text-xs text-dim">Confirm you reviewed {status.sampleSize} sample pages for content quality, tone, and obvious errors.</p>
-              <input className="input h-8 py-0 text-sm" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Reviewer note (optional)" />
-              <div className="flex gap-2">
-                <button className="btn btn-sm" disabled={pending} onClick={() => start(async () => { await recordSampleReviewAction(brandId, note.trim()); setOpen(false); router.refresh(); })}>
+              <label className="mb-1.5 block text-xs font-semibold text-dim" htmlFor="reviewer-note">Reviewer note (optional)</label>
+              <div className="flex h-9 gap-2">
+                <input id="reviewer-note" className="input h-9 min-w-0 flex-1 py-0 text-sm" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add a note about the review" />
+                <button className="btn btn-sm h-9 shrink-0" disabled={pending} onClick={() => start(async () => { await recordSampleReviewAction(brandId, note.trim()); setOpen(false); router.refresh(); })}>
                   {pending ? "Recording…" : `Sign off ${status.sampleSize}-page review`}
                 </button>
-                <button className="btn-ghost btn-sm" onClick={() => setOpen(false)}>Cancel</button>
+                <button className="btn-ghost btn-sm h-9 shrink-0" onClick={() => setOpen(false)}>Cancel</button>
               </div>
             </div>
           ) : (
