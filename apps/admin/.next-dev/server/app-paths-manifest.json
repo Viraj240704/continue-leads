@@ -1,5 +1,9 @@
 {
-  "/home/page": "app/home/page.js",
-  "/login/page": "app/login/page.js",
-  "/freshness/page": "app/freshness/page.js"
+  "/team/page": "app/team/page.js",
+  "/brands/[id]/page": "app/brands/[id]/page.js",
+  "/freshness/page": "app/freshness/page.js",
+  "/analytics/page": "app/analytics/page.js",
+  "/buyers/page": "app/buyers/page.js",
+  "/brands/new/page": "app/brands/new/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
 }

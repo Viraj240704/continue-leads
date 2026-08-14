@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import { buildTaxonomyPacks } from "./seed/taxonomy-packs.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: join(__dirname, "..", "..", ".env") });
@@ -48,10 +49,19 @@ async function main() {
   const thiagoId = await upsertUser(tenant.id, THIAGO);
   console.log("• users:", OPERATOR.email, "/", REVIEWER.email, "/", THIAGO.email);
 
-  // Global vertical packs from JSON
+  // Global vertical packs from JSON + hardcoded taxonomy packs
   const packDir = join(__dirname, "seed", "packs");
+  const basePacksByKey = new Map();
   for (const f of readdirSync(packDir).filter((f) => f.endsWith(".json"))) {
     const cfg = JSON.parse(readFileSync(join(packDir, f), "utf8"));
+    basePacksByKey.set(cfg.key, cfg);
+  }
+  const finalPacks = new Map(basePacksByKey);
+  for (const cfg of buildTaxonomyPacks(basePacksByKey)) {
+    finalPacks.set(cfg.key, cfg);
+  }
+
+  for (const cfg of finalPacks.values()) {
     await client.query(
       `INSERT INTO vertical_packs (tenant_id, key, version, name, config)
        VALUES (NULL, $1, $2, $3, $4)
