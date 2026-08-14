@@ -303,17 +303,9 @@ export function Wizard({ packs }: { packs: PackData[] }) {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [showBar, setShowBar] = useState(false);
   const [servicesPage, setServicesPage] = useState(0);
   const [suggestionsPage, setSuggestionsPage] = useState(0);
   const router = useRouter();
-
-  useEffect(() => {
-    function onScroll() { setShowBar(window.scrollY > 0); }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    setShowBar(true); // always visible
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const cityNames = useMemo(
     () => Array.from(new Set(geo.cities.map((c) => c.split("|")[1]!).filter(Boolean))),
@@ -344,6 +336,7 @@ export function Wizard({ packs }: { packs: PackData[] }) {
   const urlError = validatePattern(urlPattern);
   const blogError = validateBlog(blog);
   const requiresGenerateConfirmation = pageCount > 40;
+  const generateConfirmed = !requiresGenerateConfirmation || confirmText.trim().toUpperCase() === "GENERATE";
 
   function selectPack(id: string) {
     setPackId(id);
@@ -554,21 +547,21 @@ export function Wizard({ packs }: { packs: PackData[] }) {
 
   const activeSectionContent: Record<SectionId, React.ReactNode> = {
     product: (
-      <div className="space-y-3">
+      <div className="flex h-full flex-col">
         <CustomSelect
           value={packId}
           onChange={(v) => selectPack(v)}
-          rootClassName="max-w-[420px]"
+          rootClassName="w-full"
           options={packs.map((p) => ({ value: p.id, label: `${p.name} — ${p.services.length} services` }))}
         />
       </div>
     ),
     template: (
-      <div className="space-y-3">
+      <div className="flex h-full flex-col gap-3">
         <CustomSelect
           value={templatePresetId}
           onChange={setTemplatePresetId}
-          rootClassName="max-w-[460px]"
+          rootClassName="w-full"
           options={[
             { value: "", label: "Auto-assign (recommended) — rotates so same-product sites look distinct" },
             ...DESIGN_PRESETS.map((t) => ({ value: t.id, label: templateName(t.id) })),
@@ -911,14 +904,16 @@ export function Wizard({ packs }: { packs: PackData[] }) {
           </button>
         </div>
         {urlMode === "preset" ? (
-          <div className="space-y-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             {URL_PRESETS.map((preset) => (
               <label
                 key={preset.pattern}
-                className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm ${urlPattern === preset.pattern ? "border-primary bg-primary/5" : "border-line"}`}
+                className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 text-xs transition-colors ${
+                  urlPattern === preset.pattern ? "border-primary bg-primary/5 text-primary" : "border-line bg-white hover:bg-raised/40"
+                }`}
               >
-                <input type="radio" name="urlpat" checked={urlPattern === preset.pattern} onChange={() => setUrlPattern(preset.pattern)} />
-                <span className="mono">{preset.label}</span>
+                <input type="radio" name="urlpat" checked={urlPattern === preset.pattern} onChange={() => setUrlPattern(preset.pattern)} className="accent-primary" />
+                <span className="mono font-semibold">{preset.label}</span>
               </label>
             ))}
           </div>
@@ -982,7 +977,7 @@ export function Wizard({ packs }: { packs: PackData[] }) {
   };
 
   return (
-    <div className="space-y-4 pb-28">
+    <div className="space-y-4 pb-32">
       {/* Tab Row Container */}
       <div className="sticky top-16 z-20 bg-[#F8FAFC] py-1.5 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div
@@ -1013,33 +1008,47 @@ export function Wizard({ packs }: { packs: PackData[] }) {
       </div>
       {/* Foundation tab: 2-col side-by-side layout */}
       {activeTab === "foundation" ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid items-stretch gap-3 sm:grid-cols-2">
           {activeTabSections.map((section) => (
-            <section key={section.id} className="rounded-lg border border-line bg-white flex flex-col min-h-[260px]">
+            <section key={section.id} className="card flex h-full min-h-[228px] flex-col p-0">
               {/* Section header */}
-              <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3 border-b border-line/60">
-                <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-start justify-between gap-3 border-b border-line/60 px-5 pt-4 pb-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-faint tabular-nums shrink-0">{section.number}</span>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-ink leading-none">{section.title}</h3>
+                    <h3 className="text-sm font-semibold leading-none text-ink">{section.title}</h3>
                     <p className="mt-1 text-xs text-dim leading-snug">{section.description}</p>
                   </div>
                 </div>
-                <div className="shrink-0 flex flex-col items-end text-right gap-1.5">
+                <div className="shrink-0 flex flex-col items-end gap-1.5 text-right">
                   {section.summary && (
                     <span className="mt-0.5 hidden truncate text-xs text-faint sm:inline max-w-[140px]">{section.summary}</span>
-                  )}
-                  {section.id === "product" && (
-                    <a href="/packs/import" className="text-xs text-accent hover:underline">Import from Excel</a>
-                  )}
-                  {section.id === "template" && (
-                    <a href="/templates" className="text-xs text-accent hover:underline">Manage templates</a>
                   )}
                 </div>
               </div>
               {/* Section body */}
-              <div className="px-5 py-4 flex-1">
+              <div className="flex flex-1 flex-col px-5 py-4">
                 {activeSectionContent[section.id]}
+              </div>
+              <div className="mt-auto flex items-end justify-between border-t border-line/60 px-5 py-4">
+                {section.id === "product" ? (
+                  <a
+                    href="/packs/import"
+                    className="btn-ghost btn-sm h-9 justify-start border-line text-primary"
+                  >
+                    Import from Excel
+                  </a>
+                ) : (
+                  <span />
+                )}
+                {section.id === "template" ? (
+                  <a
+                    href="/templates"
+                    className="btn-ghost btn-sm h-9 justify-start border-line text-primary"
+                  >
+                    Manage templates
+                  </a>
+                ) : null}
               </div>
             </section>
           ))}
@@ -1093,38 +1102,56 @@ export function Wizard({ packs }: { packs: PackData[] }) {
         {status && <p className="text-sm text-data">{status}</p>}
       </div>
 
-      {/* Fixed Bottom Bar — appears after scroll */}
+      {/* Fixed Bottom Bar — estimate stats only */}
       <div
-        className={`fixed bottom-0 left-0 md:left-[72px] xl:left-[220px] right-0 z-30 border-t border-line bg-white/97 shadow-[0_-2px_8px_rgba(16,24,40,0.06)] backdrop-blur transition-transform duration-300 ${
-          showBar ? "translate-y-0" : "translate-y-full"
-        }`}
+        className="fixed bottom-0 left-0 right-0 z-30 border-t border-line bg-white/97 shadow-[0_-2px_8px_rgba(16,24,40,0.06)] backdrop-blur md:left-[72px] xl:left-[220px]"
       >
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-3 py-2 sm:px-6 flex-nowrap overflow-x-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Selected Product Thumbnail Card */}
-            <button
-              type="button"
-              onClick={() => setActiveTab("foundation")}
-              className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity shrink-0"
-            >
-              <div className="w-10 h-10 rounded-lg overflow-hidden border border-line shrink-0">
-                <img
-                  src="/brand_thumbnail.jpg"
-                  alt="Product thumbnail"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="font-semibold text-sm text-ink max-w-[180px] truncate hidden md:inline">
-                {pack?.name ?? "-"}
-              </span>
-            </button>
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-3 py-3 sm:px-6">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+            <div className="flex min-w-0 flex-col gap-3 xl:min-w-[280px] xl:max-w-[320px]">
+              <button
+                type="button"
+                onClick={() => setActiveTab("foundation")}
+                className="flex items-center gap-3 text-left transition-opacity hover:opacity-80 shrink-0"
+              >
+                <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-line">
+                  <img
+                    src="/brand_thumbnail.jpg"
+                    alt="Product thumbnail"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <span className="block max-w-[220px] truncate font-semibold text-sm text-ink">
+                    {pack?.name ?? "-"}
+                  </span>
+                  <span className="block text-xs text-faint">Current page plan estimate</span>
+                </div>
+              </button>
 
-            {/* Vertical divider */}
-            <div className="h-6 w-px bg-line hidden md:block" />
+              {!requiresGenerateConfirmation && (
+                <button
+                  onClick={submit}
+                  disabled={pending}
+                  className="btn flex h-10 w-full items-center justify-center gap-2 rounded-lg px-5 text-sm shadow-sm"
+                >
+                  {pending ? (
+                    "Working..."
+                  ) : (
+                    <>
+                      <svg className="h-4 w-4 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                        <path d="m12 3-1.912 5.886L4 9l5.886 1.912L12 17l1.912-5.886L20 9l-5.886-1.912L12 3Z" />
+                        <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+                      </svg>
+                      <span>Create brand & page plan</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
 
-            {/* Stats Pills list */}
             <div
-              className="flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden pb-1 md:pb-0"
+              className="flex min-w-0 items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden xl:flex-1 xl:justify-center pb-1 md:pb-0"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               <EstimatePill
@@ -1185,35 +1212,41 @@ export function Wizard({ packs }: { packs: PackData[] }) {
                 }
               />
             </div>
-          </div>
 
-          <div className="flex items-center gap-2 shrink-0 ml-auto sm:ml-0">
-            {requiresGenerateConfirmation && (
-              <input
-                className="input h-9 w-[110px] py-0 text-sm"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                placeholder="GENERATE"
-              />
-            )}
-
-            <button
-              onClick={submit}
-              disabled={pending || (requiresGenerateConfirmation && confirmText.trim().toUpperCase() !== "GENERATE")}
-              className="btn justify-center bg-primary text-white hover:bg-primary/95 flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm text-sm shrink-0"
-            >
-              {pending ? (
-                "Working..."
-              ) : (
-                <>
-                  <svg className="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <path d="m12 3-1.912 5.886L4 9l5.886 1.912L12 17l1.912-5.886L20 9l-5.886-1.912L12 3Z" />
-                    <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
-                  </svg>
-                  <span>Create brand & page plan</span>
-                </>
+            <div className="flex flex-col gap-2 xl:min-w-[320px] xl:max-w-[360px] xl:items-end">
+              {requiresGenerateConfirmation && (
+                <div className="w-full">
+                  <p className="mb-1.5 text-xs font-medium text-warn xl:text-right">
+                    Large batch ({pageCount} pages, ~${estCost}). Type <b>GENERATE</b> to confirm.
+                  </p>
+                  <div className="flex flex-col gap-2 sm:flex-row xl:justify-end">
+                    <input
+                      className="input h-10 w-full py-0 text-sm sm:flex-1 xl:max-w-[160px] xl:text-center"
+                      value={confirmText}
+                      onChange={(e) => setConfirmText(e.target.value)}
+                      placeholder="GENERATE"
+                    />
+                    <button
+                      onClick={submit}
+                      disabled={pending || !generateConfirmed}
+                      className="btn flex h-10 w-full items-center justify-center gap-2 rounded-lg px-5 text-sm shadow-sm sm:w-auto"
+                    >
+                      {pending ? (
+                        "Working..."
+                      ) : (
+                        <>
+                          <svg className="h-4 w-4 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                            <path d="m12 3-1.912 5.886L4 9l5.886 1.912L12 17l1.912-5.886L20 9l-5.886-1.912L12 3Z" />
+                            <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+                          </svg>
+                          <span>Create brand & page plan</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
           </div>
         </div>
       </div>
