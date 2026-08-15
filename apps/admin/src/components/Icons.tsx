@@ -123,6 +123,13 @@ export const SearchIcon = svg(
   </>,
 );
 
+export const CalendarIcon = svg(
+  <>
+    <rect x="3" y="4" width="18" height="17" rx="2" />
+    <path d="M16 2v4M8 2v4M3 10h18" />
+  </>,
+);
+
 export const LogOutIcon = svg(
   <>
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

@@ -4,17 +4,13 @@ import { leadStats } from "@/lib/leads-admin";
 import { listLeadsFiltered, type Lifecycle } from "@/lib/lead-lifecycle";
 import { can } from "@/lib/rbac";
 import { AppShell } from "@/components/AppShell";
+import { AnalyticsIcon, CheckCircleIcon, DollarIcon, FileTextIcon, TagIcon, TeamIcon } from "@/components/Icons";
 import { LeadsBrowser } from "./LeadsBrowser";
 
 export const dynamic = "force-dynamic";
 
-function Tile({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="card py-3">
-      <div className="text-xl font-bold tabular-nums">{value}</div>
-      <div className="section-title mt-0.5">{label}</div>
-    </div>
-  );
+function Tile({ label, value, icon: Icon, accent, tone }: { label: string; value: React.ReactNode; icon: (props: { size?: number; className?: string }) => React.JSX.Element; accent: string; tone: string }) {
+  return <div className="card relative py-3"><span className={`absolute right-3.5 top-3.5 rounded-lg p-2 ${tone} ${accent}`}><Icon size={19} /></span><div className="stat-num">{value}</div><div className="stat-label">{label}</div></div>;
 }
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
@@ -37,19 +33,15 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
 
   return (
     <AppShell user={user}>
-      <div className="mb-5">
-        <p className="eyebrow mb-1">Lead management</p>
-        <h1 className="font-sans text-2xl font-bold">Leads</h1>
-        <p className="text-sm text-dim">Captured leads through their lifecycle. Contact details are masked until a lead is opened.</p>
-      </div>
+      <div className="mb-5"><h1 className="font-sans text-l font-bold tracking-tight">Leads</h1></div>
 
-      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <Tile label="Total" value={stats.total} />
-        <Tile label="Valid" value={stats.valid} />
-        <Tile label="For sale" value={stats.for_sale} />
-        <Tile label="Sold" value={stats.sold} />
-        <Tile label="Revenue" value={`$${Number(stats.revenue).toFixed(0)}`} />
-        <Tile label="Pipeline" value={`$${Number(stats.pipeline).toFixed(0)}`} />
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <Tile label="Total" value={stats.total} icon={FileTextIcon} accent="text-primary" tone="bg-primary/10" />
+        <Tile label="Valid" value={stats.valid} icon={CheckCircleIcon} accent="text-info" tone="bg-info/10" />
+        <Tile label="For sale" value={stats.for_sale} icon={TagIcon} accent="text-ok" tone="bg-ok/10" />
+        <Tile label="Sold" value={stats.sold} icon={TeamIcon} accent="text-warn" tone="bg-warn/10" />
+        <Tile label="Revenue" value={`$${Number(stats.revenue).toFixed(0)}`} icon={DollarIcon} accent="text-info" tone="bg-info/10" />
+        <Tile label="Pipeline" value={`$${Number(stats.pipeline).toFixed(0)}`} icon={AnalyticsIcon} accent="text-primary" tone="bg-primary/10" />
       </div>
 
       <LeadsBrowser data={data} filters={filters} canWrite={canWrite} />
