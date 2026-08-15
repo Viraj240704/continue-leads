@@ -36,7 +36,7 @@ export default async function BuyerDetail({ params }: { params: Promise<{ id: st
         <Link href="/buyers" className="btn-ghost">← All buyers</Link>
       </div>
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="mb-6 space-y-4">
         <div>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-semibold">Purchased leads</h2>
@@ -68,8 +68,8 @@ export default async function BuyerDetail({ params }: { params: Promise<{ id: st
           )}
         </div>
 
-        <aside className="space-y-4">
-          <div className="card">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div className="card flex min-h-[208px] flex-col">
             <div className="mb-2 flex items-center justify-between">
               <p className="eyebrow">Onboarding</p>
               <ApprovalPill status={buyer.approval_status} />
@@ -81,19 +81,25 @@ export default async function BuyerDetail({ params }: { params: Promise<{ id: st
               <dt className="text-faint">Delivery</dt><dd className="mono truncate">{buyer.delivery_endpoint || "—"}</dd>
               <dt className="text-faint">Terms</dt><dd>{buyer.terms_accepted ? "accepted" : "not accepted"}</dd>
             </dl>
-            <div className="mt-3"><ApprovalControl buyerId={buyer.id} status={buyer.approval_status} /></div>
+            <div className="mt-auto pt-4"><ApprovalControl buyerId={buyer.id} status={buyer.approval_status} /></div>
           </div>
-          <div className="card">
-            <p className="stat-label mb-1">Total spend</p>
-            <div className="stat-num text-amber">${spend.toFixed(2)}</div>
-            <p className="mt-1 text-xs text-faint">{leads.length} lead(s) assigned</p>
+
+          <div className="card flex min-h-[208px] flex-col justify-between">
+            <div>
+              <p className="stat-label mb-1">Total spend</p>
+              <div className="stat-num text-amber">${spend.toFixed(2)}</div>
+            </div>
+            <p className="mt-4 text-xs text-faint">{leads.length} lead(s) assigned</p>
           </div>
-          <div className="card">
-            <p className="eyebrow mb-2">Buyer portal link</p>
-            <CopyField url={portalUrl} label="Copy" />
-            <p className="mt-2 text-[11px] text-faint">Private link — the buyer sees every lead they&apos;ve purchased. Anyone with the link has access.</p>
+
+          <div className="card flex min-h-[208px] flex-col">
+            <div>
+              <p className="eyebrow mb-2">Buyer portal link</p>
+              <CopyField url={portalUrl} label="Copy" />
+            </div>
+            <p className="mt-auto pt-3 text-[11px] leading-5 text-faint">Private link — the buyer sees every lead they&apos;ve purchased. Anyone with the link has access.</p>
           </div>
-        </aside>
+        </div>
       </div>
     </AppShell>
   );

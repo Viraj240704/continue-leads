@@ -1107,8 +1107,8 @@ export function Wizard({ packs }: { packs: PackData[] }) {
         className="fixed bottom-0 left-0 right-0 z-30 border-t border-line bg-white/97 shadow-[0_-2px_8px_rgba(16,24,40,0.06)] backdrop-blur md:left-[72px] xl:left-[220px]"
       >
         <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-3 py-3 sm:px-6">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-            <div className="flex min-w-0 flex-col gap-3 xl:min-w-[280px] xl:max-w-[320px]">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-end">
+            <div className="flex shrink-0 flex-col gap-2 xl:w-[280px]">
               <button
                 type="button"
                 onClick={() => setActiveTab("foundation")}
@@ -1150,8 +1150,10 @@ export function Wizard({ packs }: { packs: PackData[] }) {
               )}
             </div>
 
+            <div className="hidden h-6 w-px shrink-0 bg-line xl:block" />
+
             <div
-              className="flex min-w-0 items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden xl:flex-1 xl:justify-center pb-1 md:pb-0"
+              className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden md:pb-0"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               <EstimatePill
@@ -1213,7 +1215,7 @@ export function Wizard({ packs }: { packs: PackData[] }) {
               />
             </div>
 
-            <div className="flex flex-col gap-2 xl:min-w-[320px] xl:max-w-[360px] xl:items-end">
+            <div className="flex shrink-0 flex-col gap-2 xl:ml-3 xl:w-[320px] xl:items-end">
               {requiresGenerateConfirmation && (
                 <div className="w-full">
                   <p className="mb-1.5 text-xs font-medium text-warn xl:text-right">

@@ -112,7 +112,10 @@ function StateModal({
 
         {/* Modal Body */}
         <div className="grid flex-1 gap-0 overflow-hidden lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
-          <div className="space-y-4 overflow-y-auto p-6">
+          <div
+            className="space-y-4 overflow-y-auto p-6 [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
             <div className="rounded-3xl border border-primary/10 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_55%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(248,250,252,0.88))] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -320,10 +323,7 @@ export function GeoSelect({
       {/* Top bar: summary + actions */}
       <div className="rounded-[24px] border border-line/70 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.10),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.92))] p-4 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/80">Coverage planner</p>
-            <p className="mt-1 text-sm text-dim">Select states first, then refine down to cities and ZIP codes.</p>
-          </div>
+         
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-primary/15 bg-white/90 px-3 py-1.5 text-xs font-semibold text-primary">
               {sel.states.length} states
